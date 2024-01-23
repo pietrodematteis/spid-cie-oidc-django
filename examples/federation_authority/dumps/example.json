@@ -1783,7 +1783,7 @@
     "metadata": {
       "federation_entity": {
         "federation_resolve_endpoint": "http://127.0.0.1:8002/oidc/op/resolve",
-        "organization_name": "SPID OIDC identity provider",
+        "organization_name": "CIE OIDC identity provider",
         "homepage_uri": "http://127.0.0.1:8002",
         "policy_uri": "http://127.0.0.1:8002/oidc/op/en/website/legal-information",
         "logo_uri": "http://127.0.0.1:8002/static/images/logo-cie.png",
@@ -1861,7 +1861,7 @@
           "offline_access"
         ],
         "logo_uri": "http://127.0.0.1:8002/static/images/logo-cie.png",
-        "organization_name": "SPID OIDC identity provider",
+        "organization_name": "CIE OIDC identity provider",
         "op_policy_uri": "http://127.0.0.1:8002/oidc/op/en/website/legal-information",
         "request_parameter_supported": true,
         "request_uri_parameter_supported": true,
