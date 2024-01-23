@@ -39,7 +39,7 @@ AUTHN_REQUEST_SPID = {
     "acr_values": ["https://www.spid.gov.it/SpidL2", "https://www.spid.gov.it/SpidL1"],
     "claims": CLAIMS_SPID,
     "state": "fyZiOL9Lf2CeKuNT2JzxiLRDink0uPcd",
-    "ui_locales": ["codice1", "codice2", "codice3"],
+    "ui_locales": "codice1 codice2 codice3",
     "sub": "https://rp.cie.it/",
     "iss": "https://op.spid.agid.gov.it/",
     "aud": ["https://rp.spid.agid.gov.it/auth"],
