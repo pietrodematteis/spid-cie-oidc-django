@@ -263,7 +263,6 @@ class FederationEntityConfiguration(TimeStampedModel):
                 setattr(self, i, [value])
 
     def save(self, *args, **kwargs):
-        self.entity_type = self.type[0]
         self.set_jwks_as_array()
         super().save(*args, **kwargs)
 
@@ -397,8 +396,6 @@ class TrustChain(TimeStampedModel):
     @property
     def is_valid(self):
         return self.is_active and ENTITY_STATUS[self.status]
-
-    # TODO: property is_expired
 
     def __str__(self):
         return "{} [{}] [{}]".format(

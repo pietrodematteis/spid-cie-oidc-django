@@ -2,7 +2,7 @@ from cryptojwt.jwk.jwk import key_from_jwk_dict
 from cryptojwt.jwk.rsa import new_rsa_key
 from cryptography.hazmat.primitives import serialization
 from cryptojwt.jwk.rsa import RSAKey
-
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 import cryptography
 from django.conf import settings
@@ -59,14 +59,14 @@ def public_pem_from_jwk(jwk_dict: dict):
 def serialize_rsa_key(rsa_key, kind="public", hash_func="SHA-256"):
     """
     rsa_key can be
-        cryptography.hazmat.backends.openssl.rsa._RSAPublicKey
+         cryptography.hazmat.primitives.asymmetric.rsa.RSAPublicKey
         or
-        cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey
+         cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey
     """
     data = {}
-    if isinstance(rsa_key, cryptography.hazmat.backends.openssl.rsa._RSAPublicKey):
+    if isinstance(rsa_key, rsa.RSAPublicKey):
         data = {"pub_key": rsa_key}
-    elif isinstance(rsa_key, cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey):
+    elif isinstance(rsa_key, rsa.RSAPrivateKey):
         data = {"priv_key": rsa_key}
     elif isinstance(rsa_key, (str, bytes)): # pragma: no cover
         if kind == "private":

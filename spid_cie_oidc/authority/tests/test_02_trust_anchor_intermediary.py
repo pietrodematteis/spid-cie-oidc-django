@@ -2,7 +2,7 @@ from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
 from spid_cie_oidc.entity.exceptions import InvalidRequiredTrustMark
-from spid_cie_oidc.entity.jwtse import verify_jws
+from spid_cie_oidc.entity.jwtse import verify_jws, unpad_jwt_payload
 from spid_cie_oidc.entity.models import *
 
 from spid_cie_oidc.entity.trust_chain_operations import (
@@ -132,6 +132,30 @@ class TrustChainTest(TestCase):
         self.assertTrue(len(trust_chain.trust_path) == 3)
         self.assertTrue((len(trust_chain.trust_path) - 2) == trust_chain.max_path_len)
 
+        tc_ser = trust_chain.serialize()
+        _p0 = unpad_jwt_payload(tc_ser[0])
+        _p1 = unpad_jwt_payload(tc_ser[1])
+        _p2 = unpad_jwt_payload(tc_ser[2])
+        _p3 = unpad_jwt_payload(tc_ser[3])
+
+        # Entity configurations
+        self.assertEqual(_p0['iss'], _p0['sub'])
+        self.assertEqual(_p3['iss'], _p3['sub'])
+
+        # Entity statements
+        self.assertNotEqual(_p1['iss'], _p1['sub'])
+        self.assertNotEqual(_p2['iss'], _p2['sub'])
+
+        # Chain consistency (positive)
+        self.assertEqual(_p0['iss'], _p1['sub'])
+        self.assertEqual(_p1['iss'], _p2['sub'])
+        self.assertEqual(_p2['iss'], _p3['sub'])
+
+        # Chain consistency (negative)
+        self.assertNotEqual(_p1['iss'], _p0['sub'])
+        self.assertNotEqual(_p2['iss'], _p1['sub'])
+        self.assertNotEqual(_p3['iss'], _p2['sub'])
+
         dumps = dumps_statements_from_trust_chain_to_db(trust_chain)
 
         self.assertTrue(isinstance(dumps, list) and len(dumps) == 5)
@@ -259,12 +283,50 @@ class TrustChainTest(TestCase):
         res = c.post(
             url,
             data={
+                "trust_mark_id": self.rp_assigned_profile.profile.profile_id,
+                "sub": self.rp_assigned_profile.descendant.sub,
+            },
+        )
+        self.assertTrue(res.status_code == 200)
+        self.assertTrue(res.json() == {"active": True})
+
+        c = Client()
+        res = c.post(
+            url,
+            data={
                 "id": self.rp_assigned_profile.profile.profile_id,
                 "sub": self.rp_assigned_profile.descendant.sub,
             },
         )
         self.assertTrue(res.status_code == 200)
         self.assertTrue(res.json() == {"active": True})
+
+        res = c.get(
+            url,
+            data={
+                "trust_mark_id": self.rp_assigned_profile.profile.profile_id,
+                "sub": self.rp_assigned_profile.descendant.sub,
+            }
+        )
+        self.assertTrue(res.status_code == 200)
+        self.assertTrue(res.json() == {"active": True})
+
+        res = c.get(
+            url,
+            data={
+                "id": self.rp_assigned_profile.profile.profile_id,
+                "sub": self.rp_assigned_profile.descendant.sub,
+            }
+        )
+        self.assertTrue(res.status_code == 200)
+        self.assertTrue(res.json() == {"active": True})
+
+        res = c.get(
+            url,
+            data={}
+        )
+        self.assertTrue(res.status_code == 200)
+        self.assertTrue(res.json() == {"active": False})
 
         res = c.post(
             url,
@@ -279,6 +341,15 @@ class TrustChainTest(TestCase):
             url,
             data={
                 "trust_mark": self.rp_assigned_profile.trust_mark["trust_mark"][1:],
+            },
+        )
+        self.assertTrue(res.status_code == 200)
+        self.assertTrue(res.json() == {"active": False})
+
+        res = c.get(
+            url,
+            data={
+                "trust_mark_id": self.rp_assigned_profile.profile.profile_id,
             },
         )
         self.assertTrue(res.status_code == 200)

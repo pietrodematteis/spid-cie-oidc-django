@@ -275,9 +275,10 @@ class TrustChainBuilder:
                     ta_ec = stat.jwt
 
             if stat.verified_descendant_statements:
-                res.append(
-                    # [dict(i) for i in stat.verified_descendant_statements.values()]
-                    [i for i in stat.verified_descendant_statements_as_jwt.values()]
+                res.extend(
+                    [
+                        i for i in stat.verified_descendant_statements_as_jwt.values()
+                    ]
                 )
         if ta_ec:
             res.append(ta_ec)
