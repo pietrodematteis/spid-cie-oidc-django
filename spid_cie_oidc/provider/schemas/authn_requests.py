@@ -133,7 +133,7 @@ class AuthenticationRequest(BaseModel):
     claims: Optional[dict]
     state: constr(min_length=32)
     # TODO: to be improved
-    ui_locales: Optional[List[str]]
+    ui_locales: Optional[constr(regex=r'[^ ]+(\s([^ ]+))*')]
 
     # sub claim MUST not be used to prevent that this jwt
     # could be reused as a private_key_jwt
@@ -186,7 +186,7 @@ class AuthenticationRequestSpid(AuthenticationRequest):
             acr_values= ["https://www.spid.gov.it/SpidL2", "https://www.spid.gov.it/SpidL1"],
             claims= {},
             state= "fyZiOL9Lf2CeKuNT2JzxiLRDink0uPcd",
-            ui_locales= ["codice1", "codice2", "codice3"],
+            ui_locales= "codice1 codice2 codice3",
             sub= "https://rp.cie.it/",
             iss= "https://op.spid.agid.gov.it/",
             aud= ["https://rp.spid.agid.gov.it/auth"],
