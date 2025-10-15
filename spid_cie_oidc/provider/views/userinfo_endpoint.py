@@ -76,13 +76,21 @@ class UserInfoEndpoint(OpBase, View):
 
         # TODO: user claims
         jwt = {"sub": access_token_data["sub"]}
-        for claim in (
+        for scope in (
             token.session.authz_request.get(
-                "claims", {}
-            ).get("userinfo", {}).keys()
+                "scope", ""
+            ).split()
         ):
-            if claim in token.session.user.attributes:
-                jwt[claim] = token.session.user.attributes[claim]
+            if scope == 'profile':
+                jwt['name'] = token.session.user.attributes['username']
+                jwt['given_name'] = token.session.user.attributes['given_name']
+                jwt['family_name'] = token.session.user.attributes['family_name']
+                jwt['birthdate'] = token.session.user.attributes['birthdate']
+                jwt['https://attributes.eid.gov.it/fiscal_number'] = token.session.user.attributes['https://attributes.eid.gov.it/fiscal_number']
+
+            if scope == 'email':
+                jwt['email'] = token.session.user.attributes['email']
+                jwt['email_verified'] = token.session.user.attributes['email_verified']
 
         # sign the data
         key = get_key(issuer.jwks_core, KeyUsage.signature)
